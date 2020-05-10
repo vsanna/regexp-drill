@@ -43,6 +43,36 @@
         color: red;
       }
 
+      .links > li.cleared {
+        border: 1px solid green;
+        background: lightgreen;
+      }
+      ul.links {
+        position: fixed;
+        right: 0;
+        top: 0;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        max-height: calc(100% - 240px);
+        overflow: scroll;
+        box-shadow: 0px 0px 10px -2px #000;
+      }
+
+      ul.links li {
+        border: 1px solid lightgray;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 80px;
+        height: 48px;
+        background: #fff;
+        cursor: pointer;
+      }
+      ul.links li:hover {
+        background-color: lightgray;
+      }
+
       .form {
         position: fixed;
         bottom: 0;
@@ -60,6 +90,15 @@
   <body>
     <div id="app">
       <div class="container regexp">
+        <ul class="links">
+          <li
+            v-for="(score, idx) in scores"
+            :class="[!!score ? 'cleared' : 'not-cleared']"
+            @click="moveTo(idx)"
+          >
+            {{idx}}
+          </li>
+        </ul>
         <h2 class="title">{{this.currentProblemIdx+1}}. {{problem.title}}</h2>
         <ul class="constraints">
           <li v-for="item, idx in problem.constraints">{{item}}</li>
@@ -937,6 +976,8 @@
           regexp: "",
           mode: "random",
           showHint: false,
+          scores: Array(window.problems.length),
+          problemsSize: 0,
         },
         methods: {
           matching(input) {
@@ -956,6 +997,7 @@
             }
           },
           next() {
+            this.scores[this.currentProblemIdx] = true;
             if (this.mode === "random") {
               this.randomNext();
             } else if (this.mode == "sequential") {
@@ -972,8 +1014,13 @@
                 ? 0
                 : this.currentProblemIdx + 1;
           },
+          moveTo(idx) {
+            this.currentProblemIdx = idx;
+          },
         },
-        mounted() {},
+        mounted() {
+          this.problemsSize = window.problems.length;
+        },
         computed: {
           problem() {
             return window.problems[this.currentProblemIdx];
